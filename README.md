@@ -1,7 +1,7 @@
 
 <a name="readme-top"></a>
 
-<h3 align="center">RLDec</h3>
+<h3 align="center">ATLAS Decomposition Agent</h3>
 
   <p align="center">
     This project is an implementation of the ATLAS decomposition approach as described in the thesis "Application of Machine Learning for Refactoring Legacy Systems in Vehicle Production" <a href="https://arxiv.org/">(2025)</a>.
