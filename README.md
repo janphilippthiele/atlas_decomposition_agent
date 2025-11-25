@@ -60,4 +60,4 @@ In order for ALTLAS to decompose your call graph, you need to analyze and parse 
 5. The decomposition results can be found in the ```data/decompositions/new_decompositions/[your_dataset_name]``` directory
 
 # References
-The code in this project was implemented with the help of the Claude Sonnet 4.5 by Anthropic. 
+The code in this project was implemented with the help of Claude Sonnet 4.5 by Anthropic. 
