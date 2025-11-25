@@ -1,0 +1,270 @@
+# Parsing Rules Configuration for Database Dependency Analysis
+# This file defines language-specific parsing rules and patterns
+
+# Language definitions with their characteristics
+languages:
+  SQL:
+    name: "Standard SQL"
+    file_extensions: [".sql", ".ddl", ".dml"]
+    case_sensitive: false
+    
+    # Comment styles
+    comments:
+      single_line: "--"
+      multi_line_start: "/*"
+      multi_line_end: "*/"
+      nested_comments: true
+    
+    # String delimiters
+    string_delimiters:
+      - "'"
+      - '"'  # Some dialects support double quotes
+    
+    # Object identification patterns
+    object_patterns:
+      table:
+        create: 'CREATE\s+(?:OR\s+REPLACE\s+)?(?:GLOBAL\s+)?(?:TEMPORARY\s+)?TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(\S+)'
+        alter: 'ALTER\s+TABLE\s+(?:IF\s+EXISTS\s+)?(\S+)'
+        drop: 'DROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?(\S+)'
+        references: 
+          - 'FROM\s+(\S+)'
+          - 'JOIN\s+(\S+)'
+          - 'INTO\s+(\S+)'
+          - 'UPDATE\s+(\S+)'
+      
+      view:
+        create: 'CREATE\s+(?:OR\s+REPLACE\s+)?(?:MATERIALIZED\s+)?VIEW\s+(?:IF\s+NOT\s+EXISTS\s+)?(\S+)'
+        alter: 'ALTER\s+VIEW\s+(\S+)'
+        drop: 'DROP\s+VIEW\s+(?:IF\s+EXISTS\s+)?(\S+)'
+        references:
+          - 'FROM\s+(\S+)'
+      
+      index:
+        create: 'CREATE\s+(?:UNIQUE\s+)?(?:CLUSTERED\s+)?(?:NONCLUSTERED\s+)?INDEX\s+(?:IF\s+NOT\s+EXISTS\s+)?(\S+)\s+ON\s+(\S+)'
+        drop: 'DROP\s+INDEX\s+(?:IF\s+EXISTS\s+)?(\S+)'
+      
+      procedure:
+        create: 'CREATE\s+(?:OR\s+REPLACE\s+)?PROCEDURE\s+(\S+)'
+        alter: 'ALTER\s+PROCEDURE\s+(\S+)'
+        drop: 'DROP\s+PROCEDURE\s+(?:IF\s+EXISTS\s+)?(\S+)'
+        references:
+          - 'CALL\s+(\S+)'
+          - 'EXEC(?:UTE)?\s+(\S+)'
+      
+      function:
+        create: 'CREATE\s+(?:OR\s+REPLACE\s+)?FUNCTION\s+(\S+)'
+        alter: 'ALTER\s+FUNCTION\s+(\S+)'
+        drop: 'DROP\s+FUNCTION\s+(?:IF\s+EXISTS\s+)?(\S+)'
+        references:
+          - '(\w+)\s*\('  # Function calls
+      
+      trigger:
+        create: 'CREATE\s+(?:OR\s+REPLACE\s+)?TRIGGER\s+(\S+)'
+        alter: 'ALTER\s+TRIGGER\s+(\S+)'
+        drop: 'DROP\s+TRIGGER\s+(?:IF\s+EXISTS\s+)?(\S+)'
+      
+      sequence:
+        create: 'CREATE\s+SEQUENCE\s+(?:IF\s+NOT\s+EXISTS\s+)?(\S+)'
+        alter: 'ALTER\s+SEQUENCE\s+(\S+)'
+        drop: 'DROP\s+SEQUENCE\s+(?:IF\s+EXISTS\s+)?(\S+)'
+        references:
+          - 'NEXTVAL\s*\(\s*[''"]?(\S+)[''"]?\s*\)'
+          - '(\S+)\.NEXTVAL'
+    
+    # Keywords for syntax highlighting and parsing
+    keywords:
+      reserved: [
+        "SELECT", "FROM", "WHERE", "JOIN", "LEFT", "RIGHT", "INNER", "OUTER",
+        "INSERT", "UPDATE", "DELETE", "CREATE", "ALTER", "DROP", "TABLE",
+        "VIEW", "INDEX", "PROCEDURE", "FUNCTION", "TRIGGER", "WITH", "AS",
+        "GROUP", "BY", "ORDER", "HAVING", "UNION", "INTERSECT", "EXCEPT"
+      ]
+      
+    # Parsing behavior
+    parsing:
+      # Confidence thresholds
+      confidence:
+        minimum: 0.5
+        high: 0.9
+        medium: 0.7
+        low: 0.5
+      
+      # Patterns to ignore
+      ignore_patterns:
+        - '^\s*--\s*TODO'
+        - '^\s*--\s*FIXME'
+        - '^\s*--\s*GENERATED'
+        - '^\s*--\s*AUTO-GENERATED'
+
+  PL/SQL:
+    name: "Oracle PL/SQL"
+    file_extensions: [".pls", ".plb", ".pkb", ".pks", ".fnc", ".prc", ".trg"]
+    case_sensitive: false
+    
+    comments:
+      single_line: "--"
+      multi_line_start: "/*"
+      multi_line_end: "*/"
+      nested_comments: true
+    
+    string_delimiters:
+      - "'"
+      - "q'[" # Oracle's alternative quoting
+    
+    object_patterns:
+      package:
+        create: 'CREATE\s+(?:OR\s+REPLACE\s+)?PACKAGE\s+(?:BODY\s+)?(\S+)'
+        references:
+          - '(\w+)\.(\w+)\s*\('  # Package.procedure calls
+          - 'EXECUTE\s+(\w+)\.(\w+)'
+      
+      package_body:
+        create: 'CREATE\s+(?:OR\s+REPLACE\s+)?PACKAGE\s+BODY\s+(\S+)'
+      
+      type:
+        create: 'CREATE\s+(?:OR\s+REPLACE\s+)?TYPE\s+(?:BODY\s+)?(\S+)'
+      
+      # Inherits SQL patterns plus PL/SQL specific
+      procedure:
+        create: 'CREATE\s+(?:OR\s+REPLACE\s+)?(?:EDITIONABLE\s+)?PROCEDURE\s+(\S+)'
+        within_package: '(?:PROCEDURE|FUNCTION)\s+(\w+)\s*(?:\([^)]*\))?\s+(?:IS|AS)'
+      
+      cursor:
+        declare: 'CURSOR\s+(\w+)\s+IS'
+        references:
+          - 'OPEN\s+(\w+)'
+          - 'FETCH\s+(\w+)'
+          - 'CLOSE\s+(\w+)'
+    
+    keywords:
+      reserved: [
+        "DECLARE", "BEGIN", "END", "EXCEPTION", "WHEN", "THEN", "RAISE",
+        "PRAGMA", "AUTONOMOUS_TRANSACTION", "CURSOR", "FOR", "LOOP", "WHILE",
+        "IF", "ELSIF", "ELSE", "CASE", "RETURN", "EXIT", "CONTINUE",
+        "PACKAGE", "BODY", "TYPE", "RECORD", "TABLE", "VARRAY", "REF"
+      ]
+      
+    parsing:
+      confidence:
+        minimum: 0.6
+        high: 0.95
+        medium: 0.8
+        low: 0.6
+        
+      # PL/SQL specific parsing rules
+      scope_tracking: true  # Track BEGIN/END blocks
+      package_resolution: true  # Resolve package-local references
+
+  XML:
+    name: "XML Configuration"
+    file_extensions: [".xml", ".xsd", ".config"]
+    case_sensitive: true
+    
+    comments:
+      xml_style: "<!-- -->"
+    
+    string_delimiters:
+      - '"'
+      - "'"
+    
+    # XML-specific patterns for database configurations
+    object_patterns:
+      datasource:
+        pattern: '<datasource[^>]*name=["'']([^"'']+)["'']'
+        references:
+          - 'datasource-ref=["'']([^"'']+)["'']'
+      
+      query:
+        pattern: '<(?:query|select|statement)[^>]*(?:id|name)=["'']([^"'']+)["'']'
+        sql_content: '<!\[CDATA\[(.*?)\]\]>'  # Extract SQL from CDATA
+      
+      table_mapping:
+        pattern: '<(?:table|entity)[^>]*(?:name|table)=["'']([^"'']+)["'']'
+      
+      column_mapping:
+        pattern: '<(?:column|field)[^>]*(?:name|column)=["'']([^"'']+)["'']'
+    
+    parsing:
+      confidence:
+        minimum: 0.7
+        high: 0.95
+        medium: 0.85
+        low: 0.7
+      
+      # XML specific settings
+      namespace_aware: true
+      validate_schema: false
+      extract_cdata_sql: true  # Parse SQL within CDATA sections
+
+# Object type hierarchy and relationships
+object_hierarchy:
+  # Higher level objects contain lower level ones
+  SCHEMA:
+    contains: [TABLE, VIEW, PROCEDURE, FUNCTION, PACKAGE, TYPE, SEQUENCE, SYNONYM]
+  
+  PACKAGE:
+    contains: [PROCEDURE, FUNCTION, CURSOR, TYPE, VARIABLE]
+  
+  TABLE:
+    contains: [COLUMN, INDEX, CONSTRAINT, TRIGGER]
+  
+  VIEW:
+    contains: [COLUMN]
+    depends_on: [TABLE, VIEW]  # Views often depend on other objects
+
+# Global parsing settings
+global:
+  # Maximum file size to parse (in MB)
+  max_file_size_mb: 100
+  
+  # Encoding detection
+  encoding:
+    try_encodings: ["utf-8", "latin-1", "windows-1252"]
+    confidence_threshold: 0.7
+  
+  # Performance settings
+  performance:
+    batch_size: 1000
+    max_threads: 4
+    cache_parsed_files: true
+  
+  # Quality settings
+  quality:
+    require_schema_qualified: false  # Whether to require schema.object notation
+    warn_on_wildcards: true  # Warn about SELECT * usage
+    detect_naming_violations: true  # Check against naming conventions
+
+# Dependency detection rules
+dependency_rules:
+  # Confidence modifiers based on context
+  confidence_modifiers:
+    schema_qualified: 1.2  # Boost confidence for schema.object
+    in_comment: 0.3       # Reduce confidence for commented references
+    in_string: 0.5        # Reduce confidence for string literals
+    known_object: 1.1     # Boost if object exists in definitions
+    
+  # Dependency types and their patterns
+  dependency_types:
+    SELECT:
+      keywords: ["SELECT", "FROM"]
+      confidence: 0.9
+    
+    INSERT:
+      keywords: ["INSERT", "INTO"]
+      confidence: 0.95
+    
+    UPDATE:
+      keywords: ["UPDATE", "SET"]
+      confidence: 0.95
+    
+    DELETE:
+      keywords: ["DELETE", "FROM"]
+      confidence: 0.95
+    
+    EXECUTE:
+      keywords: ["EXECUTE", "EXEC", "CALL"]
+      confidence: 0.9
+    
+    FOREIGN_KEY:
+      keywords: ["REFERENCES"]
+      confidence: 1.0
