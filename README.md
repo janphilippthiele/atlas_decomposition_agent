@@ -1,7 +1,7 @@
 
 <a name="readme-top"></a>
 
-<h3 align="center">RLDec</h3>
+<h3 align="center">ATLAS Decomposition Agent</h3>
 
   <p align="center">
     This project is an implementation of the ATLAS decomposition approach as described in the thesis "Application of Machine Learning for Refactoring Legacy Systems in Vehicle Production" <a href="https://arxiv.org/">(2025)</a>.
@@ -60,4 +60,4 @@ In order for ALTLAS to decompose your call graph, you need to analyze and parse 
 5. The decomposition results can be found in the ```data/decompositions/new_decompositions/[your_dataset_name]``` directory
 
 # References
-The code in this project was implemented with the help of the Claude Sonnet 4.5 by Anthropic. 
+The code in this project was implemented with the help of Claude Sonnet 4.5 by Anthropic. 
