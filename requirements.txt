@@ -10,11 +10,6 @@ optuna==4.5.0
 pandas==2.3.1
 psutil==5.9.0
 PyYAML==6.0.2
--e git+https://github.com/janphilippthiele/atlas_decomposition_agent.git@54c244ff23222db76162a4f8c840a33b99a0dfa3#egg=rl_microservice_decomposer&subdirectory=src\decomp_agent_atlas
 scipy==1.16.0
-# Editable install with no version control (setuptools==78.1.1)
--e c:\programdata\miniconda3\lib\site-packages\setuptools-78.1.1-py3.12.egg-info
 stable_baselines3==2.7.0
-# Editable install with no version control (torch==2.5.1)
--e c:\programdata\miniconda3\lib\site-packages\torch-2.5.1-py3.12.egg-info
 tqdm==4.67.1

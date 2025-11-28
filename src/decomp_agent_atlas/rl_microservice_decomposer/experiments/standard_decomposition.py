@@ -134,7 +134,7 @@ if __name__ == "__main__":
        r'C:\Git\atlas_decomposition_agent\data\application_data\jpetstore\call_graph_jpetstore.csv',
        r'C:\Git\atlas_decomposition_agent\data\application_data\daytrader\call_graph_daytrader.csv',
        r'C:\Git\atlas_decomposition_agent\data\application_data\roller\class_interactions.parquet'
-    ]
+   ]
 
     for dataset_name, dataset_path in zip(dataset_names, dataset_paths):
         
